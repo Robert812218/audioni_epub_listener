@@ -2,31 +2,26 @@ use std::io;
 use std::io::Read;
 use std::fs;
 
+#[derive(Debug)]
+struct MyFiles {
+    file_names: Vec<String>,
+}
 
-fn main() {
-   println!("Welcome to the audio app");
-   print!("\n");
-   println!("Select your book: ");
-   print!("\n");
+fn main() -> std::io::Result<()> {
+    let mut my_files = MyFiles {
+        file_names: Vec::new(),
+    };
 
-   // display contents of library, user selects one 
-   let paths = fs::read_dir("src/library/").unwrap();
+    let paths = fs::read_dir("src/library/")?;
     
-   let mut counter = 1;
+    for path in paths {
+        let file_name = path?.file_name().into_string().unwrap();
+        my_files.file_names.push(file_name);
+    }
     
-   for path in paths {
-    println!("Name: {}, id: {}", path.unwrap().path().display(), counter);
-    counter += 1;
-   }
+    my_files.file_names.sort();
 
-   let mut select = String::new();
+    println!("{:?}", my_files);
 
-   io::stdin().read_line(&mut select).expect("Unrecognized selection");
-
-   println!("Book selected: {}", select);
-
-   let mut file = std::fs::File::open("src/library/text1.txt").unwrap();
-   let mut contents = String::new();
-   file.read_to_string(&mut contents).unwrap();
-   print!("{}", contents);
+    Ok(())
 }
