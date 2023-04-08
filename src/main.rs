@@ -1,6 +1,7 @@
 use std::fs;
 use std::io::{BufReader, Read};
 use std::path::Path;
+use std::io;
 
 struct TextFile {
     title: String,
@@ -16,18 +17,18 @@ fn read_file(path: &Path) -> Result<String, std::io::Error> {
     Ok(content)
 }
 
-fn main() {
+fn create_library() -> Vec<TextFile> {
     let folder_path = Path::new("src/library");
     let mut text_files = Vec::new();
-
+    
     let mut id_count: u8 = 0;
-
+    
     for entry in fs::read_dir(folder_path).unwrap() {
         let entry = entry.unwrap();
         let file_path = entry.path();
         let file_name = entry.file_name().into_string().unwrap();
-
-        if file_path.is_file() {
+        
+        if file_path.is_file() { 
             if let Ok(content) = read_file(&file_path) {
                 id_count += 1;
                 let text_file = TextFile {
@@ -40,22 +41,40 @@ fn main() {
         }
     }
 
-    println!("Your library:");
-    for text_file in &text_files {
-        println!("Name: {}, id: {}", text_file.title, text_file.id);
+    text_files
+}
+
+fn display_library(text_files: &[TextFile]) {
+    println!("Enter the id of the file you want to view:");
+
+    for text_file in text_files {
+        println!("id: {}, name: {}", text_file.id, text_file.title);
     }
 
+
     let mut input = String::new();
-    println!("Enter the id of the file you want to read:");
-    std::io::stdin().read_line(&mut input).unwrap();
 
-    let selected_id = input.trim().parse::<u8>().unwrap();
+    io::stdin().read_line(&mut input)
+        .expect("Failed to read line");
 
-    let selected_file = text_files.iter().find(|f| f.id == selected_id);
+    let file_id: u8 = match input.trim().parse() {
+        Ok(id) => id,
+        Err(_) => {
+            println!("Invalid input, please enter a valid file id.");
+            return;
+        }
+    };
 
-    match selected_file {
-        Some(file) => println!("{}", file.content),
-        None => println!("File not found."),
+    match text_files.iter().find(|f| f.id == file_id) {
+        Some(text_file) => println!("{}", text_file.content),
+        None => println!("File with id {} not found.", file_id),
     }
 }
 
+
+fn main() {
+    let text_files = create_library();
+    display_library(&text_files);
+
+    // rest of the code for reading user input and displaying file contents
+}
