@@ -5,3 +5,4 @@ edition = "2021"
 
 [dependencies]
 pdf = "0.8.0"
+postgres = "0.19.5"
