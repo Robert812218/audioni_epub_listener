@@ -9,6 +9,16 @@ pub struct TextFile {
     pub id: u8,
 }
 
+impl TextFile {
+	pub fn get_file_by_id(&self, id: u8) -> Option<&Self> {
+		if self.id == id {
+			Some(self)
+		} else {
+			None
+		}
+	}
+}
+
 pub fn read_file(path: &Path) -> Result<String, std::io::Error> {
     let file = fs::File::open(path)?;
     let mut buf_reader = BufReader::new(file);
@@ -44,7 +54,7 @@ pub fn create_library() -> Vec<TextFile> {
     text_files
 }
 
-pub fn display_library(text_files: &[TextFile]) {
+pub fn display_library(text_files: &[TextFile]) -> u8 {
     println!("Enter the id of the file you want to view:");
 
     for text_file in text_files {
@@ -61,12 +71,15 @@ pub fn display_library(text_files: &[TextFile]) {
         Ok(id) => id,
         Err(_) => {
             println!("Invalid input, please enter a valid file id.");
-            return;
+            return 0;
         }
     };
 
     match text_files.iter().find(|f| f.id == file_id) {
-        Some(text_file) => println!("{}", text_file.content),
-        None => println!("File with id {} not found.", file_id),
+        Some(text_file) => text_file.id,
+        None => {
+            println!("File with id {} not found.", file_id);
+            return 0;
+        }
     }
 }
