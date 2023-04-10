@@ -3,6 +3,9 @@ use epub::doc::EpubDoc;
 use std::env;
 
 mod library;
+use crate::library::TextFile;
+use crate::library as my_library;
+
 mod doc_interact;
 
 fn main() -> Result<(), postgres::Error> {
