@@ -8,4 +8,4 @@ pub fn doc_interact(selected_file_id: u8, text_files: &[TextFile]) {
     } else {
         println!("File not found.");
     }
-}
+} 
